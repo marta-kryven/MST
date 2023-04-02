@@ -7,3 +7,5 @@ Experiment fitting in R
 Modelling code in Python/Jupyter
 
 Experiment code Javascript/HTML/PHP
+
+mazes - mazes used in Experiment 1
