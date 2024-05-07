@@ -10,8 +10,8 @@ Contents
 
 4. Modelling code in Python/Jupyter -- needs Python 3.8 (but higher likely ok!)
    4.1. tree_builder.py - converting a maze map to a decision tree based on all possible ways to traverse a maze
-   4.2 number_perception_models.ipynb implements numerosity model, and Q_k_n.pickle is a table listing all mappings for actual-perceived number needed when fitting this model
-   4.3 
+   4.2 number_perception_models.ipynb -- implements numerosity model, and Q_k_n.pickle is a table listing all mappings for actual-perceived number needed when fitting this model; 
+   4.3 MST_models.ipynb, sample_model.py -- model implementations, generating tables of state-action values for each model and each combination of model parameters, which will be used to fit models to human data
 
 6. Model fitting in R
 
