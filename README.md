@@ -9,8 +9,10 @@ Contents
 3. data: _experiment_1 is data from Experiment 1 in the paper, _experiment_4 is data from Experiment 2 in the paper
 
 4. Modelling code in Python/Jupyter -- needs Python 3.8 (but higher likely ok!)
+   tree_builder.py - converting a maze map to a decision tree based on all possible ways to traverse a maze
+   
 
-5. Model fitting in R
+6. Model fitting in R
 
 
 
