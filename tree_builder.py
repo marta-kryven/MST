@@ -165,7 +165,6 @@ def next_path(maze, pos):
 
     return []
 
-
 def maze2tree(maze):
 
     # determine start position
@@ -188,6 +187,7 @@ def maze2tree(maze):
                 'celldistances': set(),
                 'children': set(),
                 'pid': None,
+                'depth': 0
                 }}
 
     agenda = [(0, maze)]
@@ -196,6 +196,7 @@ def maze2tree(maze):
 
         node, updated_map = agenda.pop(0)
         pos = tree[node]['pos']
+        node_depth = tree[node]['depth']
 
         # print('-------------------------------------------')
         # print(node, pos)        
@@ -217,6 +218,7 @@ def maze2tree(maze):
                         'celldistances': observation,
                         'children': set(),
                         'pid': node,
+                        'depth': node_depth + 1,
                         'map': updated_map, # map where nid started from!
                     }
 
@@ -230,7 +232,6 @@ def maze2tree(maze):
                 print('at node:', new_node)
 
     return tree
-
 
 # generates a tree with only one maze
 def read_maze(maze_name, exp):
@@ -311,61 +312,6 @@ def pickle_unified_tree():
     with open(f'__experiment_{EXPERIMENT}/pickled_data/tree.pickle', 'wb') as handle:
         pickle.dump(tree, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-
-def tree_buider_from_csv():
-    print('pickled from tree csv')
-
-    """ read from tree builder csv file, convert to python dictionary and pickle """
-    
-    tree = {}  # {world: {root: root node id, nid: dictionary of information}}
-    
-    if EXPERIMENT == '2_1':
-        tree_summary = csv.DictReader(open(f"__experiment_{EXPERIMENT}/csv_files/treeBuilderE2Feb2021.csv", 'r'), delimiter='\t')
-    elif EXPERIMENT == '2_2':
-        tree_summary = csv.DictReader(open(f"__experiment_{EXPERIMENT}/csv_files/tree_builder.csv", 'r'), delimiter=',')
-
-    for row in tree_summary:
-
-        world, nid = row['world'], row['NID']
-
-        # NOTE experiment 1: Exclude "Equal_8vs8" or "Equal_8vs8_mirror" in all analysis!
-        if "Equal_8vs8" in world:
-            continue
-
-        # NOTE experiment 2: subjects didn't do the following mazes
-        if world in {'whichway', 'shortandlong', 'tunnel'}:
-            continue
-
-        tree.setdefault(world, {}) \
-            .update({nid: { 'pos':      eval(row['nodeLocation']), 
-                            'pid':      row['PARENTID'], 
-                            'value':    float(row['nodeValue']), 
-                            'remains':  int(row['blackremains']),
-                            'is_leaf':  eval(row['isLeaf'].capitalize()),
-                            'children': [], 
-                            'steps_from_par': int(row['S']),
-                            'steps_from_root': int(row['stepsFromRoot']),
-                            'celldistances': eval('[' + row['cellDistances'] + ']')}
-                    })
-
-        pid = row['PARENTID']
-
-        if pid == "NA":
-            tree[world][nid]['p_exit'] = 0
-            tree[world]['root'] = nid
-            tree[world][nid]['path_from_par'] = tuple()
-        else:
-            # later used for mcts
-            tree[world][nid]['p_exit'] = 1 - tree[world][nid]['remains']/tree[world][pid]['remains']
-            tree[world][pid]['children'].append(nid)
-            path = eval(row['pathFromParent'].replace(';', ',').replace('p', ''))
-            path = [(row,col) for col,row in path]
-            tree[world][nid]['path_from_par'] = path
-
-    with open(f'__experiment_{EXPERIMENT}/pickled_data/tree.pickle', 'wb') as handle:
-        pickle.dump(tree, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-    print(f'{len(tree)} mazes')
 
 if __name__ == '__main__':
 
