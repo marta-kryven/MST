@@ -1,4 +1,3 @@
-# Feb 11 2023 
 # This analysis includes 14 models - Jupyter notebook MST_models was used to generate tree and values
 
 #'Expected_Utility', 'Discounted_Utility', 'Probability_Weighted_Utility', 'PW_DU',
@@ -69,7 +68,7 @@ threshold_prob = 0.00001
 # minimal number of subjects in a decision for it to be included in the policy
 # arbitrarily choose 10%, but at least 10
 #minimal_subjects_per_state_for_policy = 0.2 
-minimal_subjects_per_state_for_policy = 0.99 #-- this is to include only decisions visited by everyone
+minimal_subjects_per_state_for_policy = 0.9 #-- this is to include only decisions visited by everyone
 
 
 # sampling model values takes a very long time to compute, set to FALSE for all other analysis to exclude it
