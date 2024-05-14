@@ -654,9 +654,13 @@ compute_policy = function(planvalues) {
   policy = policy[ , c("world", "node", "child", "prob", "N")]
   policy = policy[order(policy$world, policy$node),]
   
-  print(paste("total decisions visited by subjects:", dim(policy)[1]))
+  print(paste("total nodes visited by subjects:", dim(policy)[1]) )
+  print(paste("total decisions made by subjects:", length(unique(policy$node)) ) )
+  print(paste("worlds visited by subjects ", length(unique(policy$world)) ) )
   policy = subset(policy, policy$N > min_subjects)
-  print(paste("used to compute policy:", dim(policy)[1]))
+  print(paste("total nodes used to compute policy:", dim(policy)[1]))
+  print(paste("total decisions used to compute policy:", length(unique(policy$node))) )
+  print(paste("worlds used to compute policy, are all included? ", length(unique(policy$world)) ) )
   return(policy)
 }
 
