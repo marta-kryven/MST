@@ -1,13 +1,4 @@
-# This analysis includes 14 models - Jupyter notebook MST_models was used to generate tree and values
-
-#'Expected_Utility', 'Discounted_Utility', 'Probability_Weighted_Utility', 'PW_DU',
-#'Heuristic_Steps', 'Heuristic_Cells', 'Heuristic_Steps_Cells', 'Random', 
-#'Sampling',
-#'EU_Numerosity', 'DU_Numerosity', 
-#'Steps_Numerosity', 'Cells_Numerosity', 'Steps_Cells_Numerosity'
-
-options (scipen=5) # to prevent R from prining out too many digits
-
+options (scipen=3) # to prevent R from prining out too many digits
 library(boot)    # Efron bootstrap
 library(ggplot2) # plots
 library(Hmisc)   # correlation
@@ -15,7 +6,6 @@ library(emdbook) # lseq
 library(stringr)
 library(dplyr)
 library(gridExtra)
-options (scipen=5) # to prevent R from prining out too many digits
 
 
 ##------------------------------------------------------------------------------------------------------
@@ -24,27 +14,20 @@ options (scipen=5) # to prevent R from prining out too many digits
 #
 ##------------------------------------------------------------------------------------------------------
 
+experiment = 4
 
-print( paste('current working directory: ', getwd() ))
 
-pwd = '/Users/mk/MST/code/R/' # make sure this points to the correct directory
-
+# TBD: replace with your directory
+pwd = getwd() 
 setwd(pwd)
 print( paste('set working directory to: ', getwd() ))
 
-# models' values and subjects' choices from Experiment 4
-experiment = 2
-sampling_model_available = TRUE
+data_directory         = paste0(pwd, "__experiment_", experiment, "/csv_files/")
+data_directory_models  = paste0(pwd, "__experiment_", experiment, "/csv_files/experiment_", experiment, "_recursive/")
+loglikes_directory     = paste0(pwd, "__experiment_", experiment, "/loglikes/")
 
-if (experiment == 1) {
-  data_directory = '/Users/mk/MST/__experiment_1/csv_files/' # make sure this points to the correct directory
-  data_directory_models = paste(data_directory, 'experiment_1_recursive/', sep="")
-  loglikes_directory = '/Users/mk/MST/data/loglikes_E1/'    # precalculated loglikes saved here
-} else if (experiment == 2) {
-  data_directory = '/Users/mk/MST/__experiment_4/csv_files/' # make sure this points to the correct directory
-  data_directory_models = paste(data_directory, 'experiment_4_recursive/', sep="")
-  loglikes_directory = '/Users/mk/MST/data/loglikes_E4/'    # precalculated loglikes saved here
-} 
+
+sampling_model_available = TRUE
 source(paste(pwd, "data_utils.R", sep = ""))
 
 
@@ -55,24 +38,14 @@ source(paste(pwd, "data_utils.R", sep = ""))
 ##------------------------------------------------------------------------------------------------------
 
 
-# The smallest probability that will replace zero probabilities when fitting models.
-# We can not have zero probabilities of any action under a model, because this will make the given model zero-likely
-# This threshold should be chosen based on the floating point percision in the exported values.
-# For example, if the exported values have three floating-point digits, e.g. 0.xxx, then this probability can be 0.0001 or less.
-# Model fits can fluctuate based on how threshold_prob is chosen: the smaller this is, the more weight will zero probabilities have.
-# TBD: refit the results with different threshold_prob
+# The smallest probability that will replace zero probabilities when fitting models
+# as we can not have zero probabilities of any action under a model
 threshold_prob = 0.00001 
 
-
-
 # minimal number of subjects in a decision for it to be included in the policy
-# arbitrarily choose 10%, but at least 10
 #minimal_subjects_per_state_for_policy = 0.2 
-minimal_subjects_per_state_for_policy = 0.9 #-- this is to include only decisions visited by everyone
+minimal_subjects_per_state_for_policy = 0.9 
 
-
-# sampling model values takes a very long time to compute, set to FALSE for all other analysis to exclude it
-#sampling_model_available = FALSE
 
 # this is for colouring bars
 model_names = c("PW", "EU", "DU", "PW_DU", "DU-Num", "EU-Num", "Sampling", "PW-DU")
@@ -87,13 +60,13 @@ use_priors = TRUE # this will set prior on softmax tau when fitting models
 ##------------------------------------------------------------------------------------------------------
 
 planvalues = read.csv( paste(data_directory,'subject_decisions_with_values.csv',  sep = ""), sep = ",", strip.white=TRUE)
-planvalues = removeNodesWithOnlyOneChild(planvalues)                   # cleaning up - in case there are still some rows that are not decisions 
-planvalues = planvalues[,!(names(planvalues) %in% c("nodeValue", "path"))]     # remove this column since it is empty, it used to be EU model values
+planvalues = removeNodesWithOnlyOneChild(planvalues) # cleaning up rows that are not decisions 
+planvalues = planvalues[,!(names(planvalues) %in% c("nodeValue", "path"))] # unused
 
 
 ##------------------------------------------------------------------------------------------------------
 #
-# if any subjects should be excluded for failing more than twice practice quiz, exclude them here
+# subjects excluded for failing practice quiz more than twice
 #
 ##------------------------------------------------------------------------------------------------------
 
@@ -101,23 +74,15 @@ if (experiment == 1) {
   
   exclude = c("S43329812", "S69282470", "S26848889")
   planvalues = subset(planvalues, !(planvalues$subject %in% exclude ))
-  
-  # if only two-choice mazes included
-  #planvalues = planvalues[!grepl("3ways", planvalues$world, fixed = TRUE),]
-  #planvalues = planvalues[!grepl("4ways", planvalues$world, fixed = TRUE),]
-  
+    
 } else if (experiment == 4) {
   
   # this map is missing
   planvalues = subset(planvalues, planvalues$world != "medium_library") 
   
-  exclude = c("S99772349", "S5999785", "S13674761", "S51193428", "S3248008", "S25705172", "S23668923", "S8621940") # more than two quiz attempts
-  planvalues = subset(planvalues, !(planvalues$subject %in% exclude ))
-  
-  # generate 'policy' from decisions visited by all subjects - 24 decisions per subject, 55 unique decisions
-  # 20 of the decisions are the first decisions in a maze 
-  # planvalues = subset(planvalues, (planvalues$nodeName %in% policy$node) | (planvalues$availableChildName %in% policy$child))
-  
+  # more than two quiz attempts
+  exclude = c("S99772349", "S5999785", "S13674761", "S51193428", "S3248008", "S25705172", "S23668923", "S8621940") 
+  planvalues = subset(planvalues, !(planvalues$subject %in% exclude ))   
 } 
   
 # get the list of all subjects
