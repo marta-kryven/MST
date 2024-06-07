@@ -2,6 +2,8 @@
 
 Contents
 
+map_editor.py -  a grid-editing dialog tool for editing an existing maps, or drawing a new one 
+
 1. subject_data_parser.py -- processing new data collected using web-experiment, needed for collecting new data
    
 2. MST_webcode  -- Experiment implementation in HTML/CSS/PHP/JavaScript. To run the experiment this code needs to be downloaded to web-server with an external IP, with Apache and PHP installed. It also needs an empty directory called data to which Apache has writing access.
