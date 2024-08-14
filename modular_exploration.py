@@ -5,7 +5,7 @@ import utils as ut
 
 import enum
 
-from partition_prompt import regenerate_pattern, segment_map
+from partition_prompt import PartitionPrompt # regenerate_pattern, segment_map
 
 from tree_builder import maze2tree
 
@@ -25,6 +25,8 @@ input_id = "bigger_maze" #"twolines" # "test"
 input_map = pattern_editor.read_pattern(f'test_patterns/{input_id}.txt')
 input_dims = (len(input_map), len(input_map[0]))
 str_map = ut.array_to_string(input_map)
+
+pp = PartitionPrompt()
 
 def get_errors_and_omissions(input_map, output):
     errors_and_omissions = (input_dims[0]*input_dims[1]) - np.sum(input_map == output)
@@ -56,7 +58,7 @@ copies = [
     {"top left":(6,0), "reflect": True, "rotations": 0},
     {"top left":(6,3), "reflect": True, "rotations": 0},
 ]
-output = regenerate_pattern(fragment, copies, input_dims)
+output = pp.regenerate_pattern(fragment, copies, input_dims)
 print("Intended response:")
 report(output)
 
@@ -101,7 +103,7 @@ set_exit(gt_map,-2,-1)
 
 print(gt_map)
 
-segmentation = segment_map(fragment, copies)
+segmentation = pp.segment_map(fragment, copies)
 
 # Compute subtrees for entering fragment from any entrance
 subtrees = {}
