@@ -5,7 +5,7 @@ import utils as ut
 
 import enum
 
-from partition_prompt import regenerate_pattern
+from partition_prompt import regenerate_pattern, segment_map
 
 from tree_builder import maze2tree
 
@@ -21,7 +21,7 @@ class Cell(enum.Enum):
 
 # from compositional_map_synthesis.partition_prompt import regenerate_pattern
 
-input_id = "maze" #"twolines" # "test"
+input_id = "bigger_maze" #"twolines" # "test"
 input_map = pattern_editor.read_pattern(f'test_patterns/{input_id}.txt')
 input_dims = (len(input_map), len(input_map[0]))
 str_map = ut.array_to_string(input_map)
@@ -47,12 +47,14 @@ fragment = [
     [1, 0, 1],
     [0, 0, 1],
     [1, 0, 1],
+    [0, 0, 1],
+    [1, 0, 1],
 ]
 copies = [
     {"top left":(0,0), "reflect": False, "rotations": 0},
     {"top left":(0,3), "reflect": False, "rotations": 0},
-    {"top left":(4,0), "reflect": False, "rotations": 0},
-    {"top left":(4,3), "reflect": False, "rotations": 0},
+    {"top left":(6,0), "reflect": True, "rotations": 0},
+    {"top left":(6,3), "reflect": True, "rotations": 0},
 ]
 output = regenerate_pattern(fragment, copies, input_dims)
 print("Intended response:")
@@ -94,10 +96,74 @@ def set_exit(map, i, j):
 
 gt_map = convert_to_mst_format(input_map)
 
+set_start(gt_map,5,0)
+set_exit(gt_map,-2,-1)
+
 print(gt_map)
 
-set_start(gt_map,3,0)
-set_exit(gt_map,-1,-2)
+segmentation = segment_map(fragment, copies)
 
-tree = maze2tree(gt_map)
+# Compute subtrees for entering fragment from any entrance
+subtrees = {}
+def find_entrances(map):
+    entrances = []
+    height, width = len(map), len(map[0])
+
+    # Top and bottom
+    for j in range(width):
+        if map[0][j] == 0:
+            entrances.append((0,j))
+        if map[-1][j] == 0:
+            entrances.append((height-1,j))
+    # Left and right
+    for i in range(height):
+        if map[i][0] == 0:
+            entrances.append((i,0))
+        if map[i][-1] == 0:
+            entrances.append((i,width-1))
+
+    return entrances
+frag_map = convert_to_mst_format(fragment)
+entrances = find_entrances(frag_map)
+# We want subtrees rooted where observations are made.
+# I will assume that observations can't be made at entrances,
+# and that subtrees at observation locations do not depend on 
+# the path preceding that first observation - both these assumptions
+# should hold up in general.
+for entrance in entrances:
+    i,j = entrance
+    set_start(frag_map, i, j)
+    print(frag_map)
+    subtree = maze2tree(frag_map)
+    frag_map[i][j] = 0
+    # The larger search enters this subtree where the first observation
+    # is made, NOT at the entrance
+    root = subtree[1]['pos']
+    del subtree[0]
+    for nid in subtree.keys():
+        branch = subtree[nid]
+        if nid == 1:
+            branch['path_from_par'] = []
+            branch['steps_from_par'] = 0
+            branch['path_from_root'] = []
+            branch['steps_from_root'] = 0
+        else:
+            # Delete subpath from entrance
+            while not branch['path_from_root'][0] == root:
+                branch['path_from_root'].pop(0)
+            branch['steps_from_root'] = len(branch['path_from_root'])
+        branch['depth'] = branch['depth'] - 1
+    # Its possible that multiple entrances lead to the same
+    # subtree (for instance in bigger_maze, there are 4 entrances
+    # but only the top and bottom forks are roots for planning subtrees)
+    if root not in subtrees.keys():
+        subtrees[root] = subtree
+        print(subtree)
+print(entrances)
+# print(subtrees)
+# These subtrees aren't directly usable for navigation
+# because of coordinate changes, but the values should be usable.
+
+tree = maze2tree(gt_map, fragment, segmentation, subtrees)
+print(tree)
 
