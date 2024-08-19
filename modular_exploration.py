@@ -101,9 +101,11 @@ gt_map = convert_to_mst_format(input_map)
 set_start(gt_map,5,0)
 set_exit(gt_map,-2,-1)
 
-print(gt_map)
+print(ut.array_to_string(gt_map))
 
 segmentation = pp.segment_map(fragment, copies)
+print(segmentation)
+print(f"Number of segmented cells: {len(segmentation.keys())}")
 
 # Compute subtrees for entering fragment from any entrance
 subtrees = {}
@@ -135,7 +137,7 @@ entrances = find_entrances(frag_map)
 for entrance in entrances:
     i,j = entrance
     set_start(frag_map, i, j)
-    print(frag_map)
+    # print(frag_map)
     subtree = maze2tree(frag_map)
     frag_map[i][j] = 0
     # The larger search enters this subtree where the first observation
@@ -160,12 +162,13 @@ for entrance in entrances:
     # but only the top and bottom forks are roots for planning subtrees)
     if root not in subtrees.keys():
         subtrees[root] = subtree
-        print(subtree)
-print(entrances)
+        # print(subtree)
+#print(entrances)
 # print(subtrees)
 # These subtrees aren't directly usable for navigation
 # because of coordinate changes, but the values should be usable.
 
+print(segmentation.keys())
 tree = maze2tree(gt_map, fragment, segmentation, subtrees)
-print(tree)
+print(len(tree.keys()))
 
