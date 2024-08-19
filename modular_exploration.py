@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 
 import pattern_editor
 import utils as ut
@@ -8,6 +9,8 @@ import enum
 from partition_prompt import PartitionPrompt # regenerate_pattern, segment_map
 
 from tree_builder import maze2tree
+
+EXPERIMENT = 5
 
 class Cell(enum.Enum):
     WALL = 3 
@@ -172,3 +175,11 @@ print(segmentation.keys())
 tree = maze2tree(gt_map, fragment, segmentation, subtrees)
 print(len(tree.keys()))
 
+# Dump as an individual tree
+with open(f"__experiment_{EXPERIMENT}/trees/{input_id}.pickle", 'wb') as handle:
+        pickle.dump(tree, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+# Dump as a 'unified' tree - as long as we're only testing one, just a dict wrapper
+with open(f'__experiment_{EXPERIMENT}/pickled_data/tree.pickle', 'wb') as handle:
+    tree['root'] = 0 # Apparently this is necessary
+    pickle.dump({input_id: tree}, handle, protocol=pickle.HIGHEST_PROTOCOL)

@@ -220,9 +220,9 @@ def maze2tree(maze, fragment = None, segmentation = {}, subtrees = None): # TODO
                 # This is the branch of the global tree that the subtree will be stiched too
                 branch = tree[node]
                 # Now we actually stitch the subtree in
-                def stitch(nid):
+                def stitch(nid, pid=None):
                     """
-                    Given the (local) nid within a subtree, recursively stitch a new node into the global tree.
+                    Given the local nid within a subtree and its global pid recursively stitch a new node into the global tree.
                     """
                     subtree_branch = subtree[nid]
                     if nid == 1: # TODO: perhaps relabel to make this 0
@@ -231,25 +231,25 @@ def maze2tree(maze, fragment = None, segmentation = {}, subtrees = None): # TODO
                         # TODO: assuming for now the subtrees are nontrivial
                         #print("nid is 1")
                         for child in subtree_branch['children']:
-                            stitch(child)
+                            stitch(child, node)
                     else:
                         #print('nid is not 1')
-                        new_node = node + nid - 1
+                        new_node = max(tree) + 1
                         pos = frag_to_map[subtree_branch['pos']]
-                        pid = node + subtree_branch['pid'] - 1
                         parent_map = tree[pid]['map']
-                        updated_map = update_map(parent_map, tree[pid]['pos'], pos)
+                        # Note that the parent's map does not include its own observations, which must be added here TODO: what if we start in a fragment?
+                        starting_map = update_map(parent_map, tree[pid]['path_from_par'][0], tree[pid]['path_from_par'][-1])
                         observation = observation_made(parent_map, pos)
                         stitched_branch = {
                             'pos': pos, 
-                            'remains': tree[pid]['remains'] - len(observation), #+ subtree_branch['remains'] - local_remains, # TODO: use observations_made on transformed new position
+                            'remains': tree[pid]['remains'] - len(observation),
                             'path_from_par': [frag_to_map[step] for step in subtree_branch['path_from_par']], # only nid=1 would be wrong
                             'path_from_root': branch['path_from_root'][:-1] + [frag_to_map[step] for step in subtree_branch['path_from_root']],
-                            'celldistances': observation, #{frag_to_map[obs] for obs in subtree_branch['celldistances']}, # TODO: is this valid?
+                            'celldistances': observation,
                             'children': set(),
                             'pid': pid,
                             'depth': tree[pid]['depth'] + 1,#global_depth + subtree_branch['depth'],
-                            'map': updated_map, # the map this node started with
+                            'map': starting_map, # the map this node started with before its own observations
                             'copies_explored': [corners for corners in tree[pid]['copies_explored']],
                         }
                         # TODO: instead use update_map on the transformed new position
@@ -262,17 +262,20 @@ def maze2tree(maze, fragment = None, segmentation = {}, subtrees = None): # TODO
                         stitched_branch['steps_from_par'] = len(stitched_branch['path_from_par'])
                         stitched_branch['steps_from_root'] = len(stitched_branch['path_from_root'])
                         tree[pid]['children'].add(new_node)
+                        # print(f"adding child {new_node} to {pid} in global tree (recursive stitching).")
                         tree[new_node] = stitched_branch
                         if not subtree_branch['children']:
                             # the copy is fully explored, proceed with an ordinary (global) search
                             stitched_branch['copies_explored'].append(copy['top left'])
+                            # when popped from the global searches queue, will need map updated with observations. 
+                            updated_map = update_map(starting_map, tree[pid]['pos'], pos) 
                             agenda.append(
                                 (new_node, updated_map),
                             )
                         else:
                             # exploration continues within the subtree
                             for child in subtree_branch['children']:
-                                stitch(child)
+                                stitch(child, new_node)
                 stitch(1)
                 continue # global exploration continues not from this node, but from the leaves of the subtree which have been added to the agenda.
             else:
@@ -307,6 +310,7 @@ def maze2tree(maze, fragment = None, segmentation = {}, subtrees = None): # TODO
             agenda.append((new_node, update_map(updated_map, path[0], path[-1])))
 
             tree[node]['children'].add(new_node)
+            # print(f"adding child {new_node} to {node} in global tree (global search).")
             tree[new_node] = branch
 
             if new_node % 200 == 0:
