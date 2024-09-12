@@ -180,10 +180,11 @@ def maze2tree(maze, fragment = None, segmentation = {}):
             elif val in {0,2}:
                 remains += 1
     
+    observation = observation_made(maze, pos)
     maze = update_map(maze, pos, pos)
 
     tree = {0: {'pos': pos,
-                'remains': remains,
+                'remains': remains - len(observation), # CW: Added this correction, original version didn't count out observations for root?
                 'path_from_par': [],
                 'path_from_root': [],
                 'steps_from_par': 0,
@@ -220,6 +221,8 @@ def maze2tree(maze, fragment = None, segmentation = {}):
                 if (base_i,base_j) in subtrees.keys():
                     subtree = subtrees[(base_i,base_j)]
                 else:
+                    # print(f"pos is {pos}")
+                    # print(f"base i {base_i}, base j {base_j}")
                     fragment[base_i][base_j] = 5 # start
                     subtree = maze2tree(fragment)
                     fragment[base_i][base_j] = 0
