@@ -324,8 +324,9 @@ def maze2tree(maze, fragment = None, segmentation = {}):
 def read_maze(maze_name, exp):
 
     with open(f'__experiment_{exp}/mazes/{maze_name}.txt', 'r') as f:
-        ncols = int(f.readline())
-        nrows = int(f.readline())
+        # Apparently the format with ncols and nrows is obselete.
+        # ncols = int(f.readline())
+        # nrows = int(f.readline())
         maze = f.readlines()
     
     # preprocessing of maze from text

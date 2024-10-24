@@ -12,7 +12,8 @@ from partition_prompt import PartitionPrompt, regenerate_pattern #, segment_map
 
 from tree_builder import maze2tree
 
-EXPERIMENT = 5
+# 5 is for modular planning, 6 is ordinary optimal planning
+EXPERIMENT = 6
 
 # TODO: move this somewhere it can be used commonly here and in maze2tree
 class Cell(enum.Enum):
@@ -29,10 +30,141 @@ class Cell(enum.Enum):
 
 # EXAMPLES WITH INTENDED SEGMENTATION
 
+# four units
+
+# four units
+# subdir = "four_units"
+# input_id = "four_units"
+# fragment = [[0]] # TODO
+# copies = [{"top left": (0,0), "reflect": False, "rotations": 0}] # TODO
+# start_row = 3
+# start_col = 0
+# exit_row = 0
+# exit_col = -1
+
+# 4 UNIT CORRIDOR:
+
+# 4 unit corridor 
+# subdir = "4_unit_corridor"
+# input_id = "4_unit_corridor"
+# fragment = [
+#     [0,0,0,0,0,0,0,],
+#     [0,1,0,1,1,0,0,],
+#     [0,1,0,1,1,0,0,],
+# ]
+# copies = [
+#     {"top left": (0,1), "reflect": False, "rotations": 0},
+#     {"top left": (0,9), "reflect": False, "rotations": 0},
+#     {"top left": (6,1), "reflect": False, "rotations": 2},
+#     {"top left": (6,9), "reflect": False, "rotations": 2},
+# ]
+# start_row = 4
+# start_col = 0
+# exit_row = -1
+# exit_col = -1
+
+# 4 unit corridor with visibility 1
+# subdir = "4_unit_corridor"
+# input_id = "4_unit_corridor_vis1"
+# fragment = [
+#     [2,2,2,2,2,2,2,],
+#     [0,1,0,1,1,0,0,],
+#     [0,1,0,1,1,0,0,],
+# ]
+# copies = [
+#     {"top left": (0,1), "reflect": False, "rotations": 0},
+#     {"top left": (0,9), "reflect": False, "rotations": 0},
+#     {"top left": (6,1), "reflect": False, "rotations": 2},
+#     {"top left": (6,9), "reflect": False, "rotations": 2},
+# ]
+# start_row = 4
+# start_col = 0
+# exit_row = -1
+# exit_col = -1
+
+# 6 UNITS
+
+# 6 units
+# subdir = "6_units"
+# input_id = "6_units"
+# fragment = [
+#     [0,0,],
+#     [0,0,],
+# ]
+# copies = [
+#     {"top left": (0,1), "reflect": False, "rotations": 0},
+#     {"top left": (0,4), "reflect": False, "rotations": 0},
+#     {"top left": (0,7), "reflect": False, "rotations": 0},
+#     {"top left": (7,1), "reflect": False, "rotations": 0},
+#     {"top left": (7,4), "reflect": False, "rotations": 0},
+#     {"top left": (7,7), "reflect": False, "rotations": 0},
+# ]
+# start_row = 4
+# start_col = 0
+# exit_row = 0
+# exit_col = 7
+
+# CORRIDORS To ROOMS WITH ALCOVES
+
+# corridors to rooms with alcoves visibility level 1
+# subdir = "corridors_to_rooms_with_alcoves"
+# input_id = "corridors_to_rooms_with_alcoves_vis1"
+# fragment = [
+#     [0,0,0,0,0,0,0,0,0,],
+#     [0,0,0,0,0,0,0,0,0,],
+#     [2,2,2,2,2,2,2,2,2,],
+#     [0,0,0,0,0,0,0,1,0,],
+# ]
+# copies = [
+#     {"top left": (0,2), "reflect": False, "rotations": 0},
+#     {"top left": (5,2), "reflect": True, "rotations": 2},
+# ]
+# start_row = 4
+# start_col = 0
+# exit_row = 3
+# exit_col = -1
+
+# corridors to rooms with alcoves constrained for efficiency, visibility level 1
+# subdir = "corridors_to_rooms_with_alcoves"
+# input_id = "corridors_to_rooms_with_alcoves_constrained_vis1"
+# fragment = [
+#     [0,0,0,0,0,0,0,1,2,],
+#     [0,0,0,0,0,0,0,1,1,],
+#     [2,2,2,2,2,2,2,2,2,],
+#     [0,0,0,0,0,0,0,1,0,],
+# ]
+# copies = [
+#     {"top left": (0,2), "reflect": False, "rotations": 0},
+#     {"top left": (5,2), "reflect": True, "rotations": 2},
+# ]
+# start_row = 4
+# start_col = 0
+# exit_row = 3
+# exit_col = -1
+
+# corridors to small rooms with alcoves
+# subdir = "corridors_to_rooms_with_alcoves"
+# input_id = "corridors_to_small_rooms_with_alcoves"
+# fragment = [[0]] # TODO
+# copies = [{"top left": (0,0), "reflect": False, "rotations": 0}] # TODO
+# start_row = 4
+# start_col = 0
+# exit_row = 3
+# exit_col = -1
+
+subdir = "corridors_to_rooms_with_alcoves"
+input_id = "corridors_to_tiny_rooms_with_alcoves"
+fragment = [[0]] # TODO
+copies = [{"top left": (0,0), "reflect": False, "rotations": 0}] # TODO
+start_row = 2
+start_col = 0
+exit_row = 3
+exit_col = -1
+
 # Bigger maze example
 # input_id = "bigger_maze" #"twolines" # "test"
 # fragment = [
-#     [1, 0, 1],
+#     [1, 0, 1]
 #     [0, 0, 1],
 #     [1, 0, 1],
 #     [0, 0, 1],
@@ -71,27 +203,49 @@ class Cell(enum.Enum):
 # exit_row = 0
 # exit_col = 3
 
+# Two halls with closets, start observed
+# input_id = "two_halls_with_closets_obs"
+# fragment = [
+#     [0,0],
+#     [0,1],
+#     [0,1],
+#     [0,1],
+#     [0,1],
+#     [0,1],
+#     [0,1],
+#     [0,1],
+#     [2,2],
+# ]
+# copies = [
+#     {"top left":(0,0), "reflect": False, "rotations": 0},
+#     {"top left":(0,3), "reflect": True, "rotations": 0},
+# ]
+# start_row = -1
+# start_col = 2
+# exit_row = 0
+# exit_col = 3
+
 # Two small rooms with closets
-input_id = "two_small_rooms_with_closets"
-fragment = [
-    [0,0,0],
-    [0,0,1],
-    [0,0,1],
-    [0,0,1],
-    [0,0,1],
-    [0,0,1],
-    [0,0,1],
-    [0,0,1],
-    [0,0,0],
-]
-copies = [
-    {"top left":(0,0), "reflect": False, "rotations": 0},
-    {"top left":(0,4), "reflect": True, "rotations": 0},
-]
-start_row = -1
-start_col = 3
-exit_row = 0
-exit_col = 4
+# input_id = "two_small_rooms_with_closets"
+# fragment = [
+#     [0,0,0],
+#     [0,0,1],
+#     [0,0,1],
+#     [0,0,1],
+#     [0,0,1],
+#     [0,0,1],
+#     [0,0,1],
+#     [0,0,1],
+#     [0,0,0],
+# ]
+# copies = [
+#     {"top left":(0,0), "reflect": False, "rotations": 0},
+#     {"top left":(0,4), "reflect": True, "rotations": 0},
+# ]
+# start_row = -1
+# start_col = 3
+# exit_row = 0
+# exit_col = 4
 
 # Two rooms with closets
 # input_id = "two_rooms_with_closets"
@@ -116,9 +270,77 @@ exit_col = 4
 # exit_row = 0
 # exit_col = 3
 
+# Corridors to rooms with alcoves + observed cells
+# input_id = "corridors_to_rooms_with_alcoves_obs"
+# fragment = [
+#     [0,]*9,
+#     [0,]*9,
+#     [2,]*9,
+#     [0,]*7 + [1,0],
+# ]
+# copies = [
+#     {"top left":(0,2), "reflect": False, "rotations": 0},
+#     {"top left":(5,2), "reflect": True, "rotations": 2},
+# ]
+# start_row = 5
+# start_col = 0
+# exit_row = 3
+# exit_col = -1
+
+# Snaking path with loops
+# input_id = "snaking_path_with_loops"
+# fragment = [
+#     [1,1,0,0,1,1],
+#     [1,0,0,0,0,1],
+#     [1,0,1,1,0,1],
+#     [0,0,1,1,0,0],
+#     [0,0,1,1,0,0],
+#     [1,0,1,1,0,1],
+#     [1,0,0,0,0,1],
+# ]
+# copies = [
+#     {"top left":(14,0), "reflect": False, "rotations": 1}, # TODO: the current code doesn't allow us to start in a fragment
+#     {"top left":(9,12), "reflect": False, "rotations": 0},
+#     {"top left":(6,0), "reflect": False, "rotations": 1},
+#     {"top left":(1,13), "reflect": False, "rotations": 1},
+# ]
+# start_row = -2 # (-3,0) is more interesting but not supported 
+# start_col = 8
+# exit_row = 1
+# exit_col = -4
+
+# Simplified snaking path
+# input_id = "simplified_snaking_path"
+# fragment = [
+#     [1,0,0,0,1],
+#     [0,0,1,0,0],
+#     [1,0,0,0,1],
+# ]
+# copies = [
+#     {"top left":(7,0), "reflect": False, "rotations": 1},
+#     {"top left":(5,6), "reflect": False, "rotations": 0},
+#     {"top left":(2,2), "reflect": False, "rotations": 0},
+# ]
+# start_row = -3
+# start_col = 3
+# exit_row = 1
+# exit_col = -4
+
+
+# SET EXPERIMENT = 6: The following example is not meant to demonstrate map decomposition
+# Three closet local gadget
+# input_id = "three_closet_local_gadget"
+# fragment = [
+#     [],
+# ]
+# copies = []
+# start_row = -1
+# start_col = 2
+# exit_row = -3
+# exit_col = -1
 
 # READ MAP AND RECONSTRUCT FROM FRAGMENTS
-input_map = pattern_editor.read_pattern(f'test_patterns/{input_id}.txt')
+input_map = pattern_editor.read_pattern(f'/home/cwyeth/Desktop/compositional_map_synthesis/test_patterns/{subdir}/{input_id}.txt')
 input_dims = (len(input_map), len(input_map[0]))
 str_map = ut.array_to_string(input_map)
 
@@ -157,6 +379,8 @@ def convert_to_mst_format(map):
             return Cell.UNOBSERVED_EMPTY.value
         elif cell == 1:
             return Cell.WALL.value
+        elif cell == 2:
+            return Cell.OBSERVED_EMPTY.value
         else:
             raise Exception(
                 "Case not implement, perhaps an omitted cell",
@@ -259,7 +483,7 @@ if EXPERIMENT == 5:
 else:
     tree = maze2tree(gt_map)
 print(f"Tree size: {len(tree.keys())}")
-print(tree)
+# print(tree)
 
 # Dump as an individual tree
 with open(f"__experiment_{EXPERIMENT}/trees/{input_id}.pickle", 'wb') as handle:
@@ -298,4 +522,13 @@ def pickle_unified_tree():
 
 pickle_unified_tree()
 
-shutil.copyfile(f"test_patterns/{input_id}.txt", f"__experiment_{EXPERIMENT}/mazes/{input_id}.txt")
+# TODO: This seems actually incorrect, mazes here should be in tree builder's form like gt_map
+# shutil.copyfile(
+#     f"/home/cwyeth/Desktop/compositional_map_synthesis/test_patterns/{subdir}/{input_id}.txt", 
+#     f"__experiment_{EXPERIMENT}/mazes/{input_id}.txt",
+# )
+# This doubles as converting maps to the MST format which we'll want to switch to anyway:
+# includes start and exit as well. 
+with open(f"__experiment_{EXPERIMENT}/mazes/{input_id}.txt", 'w') as f:
+    for row in gt_map:
+        f.write("".join(map(str, row)) + "\n")
