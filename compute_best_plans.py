@@ -37,7 +37,7 @@ maze_names = [
     # "6_units_flip",
     # "four_units_flip",
     "6_units",
-    # "four_units",
+    "four_units",
     # "6_units_vis1",
     # "four_units_vis1",
     # "big_alcoves",
@@ -885,22 +885,29 @@ def visualize_all_best_paths(maze_name, model_name, param):
     axs = axs.flat
 
     nodes_paths = best_paths(maze_name, param, MODEL2RAWNODEVAL[model_name], exit_pos)
-    print(nodes_paths)
+    #print(nodes_paths)
 
+    best_path_list = []
     for (nodes_path, path_value), ax in zip(nodes_paths, axs):
     
         visualize_maze(maze, ax=ax) 
-        visualize_nodes_path(maze_name, nodes_path, ax=ax)
+        best_path_list.append(
+            visualize_nodes_path(maze_name, nodes_path, ax=ax),
+        )
         # This crowds the plot far too much
         #ax.set_title(f'{model_name} | {param} | {round(path_value,3)}')
 
     fig.suptitle(maze_name)
     plt.show()
+    return best_path_list
 
 ##########################################################################################
 # PHASE 3: Extract all optimal plans for each maze
 ##########################################################################################    
 
+best_path_dict = {}
 for maze_name in maze_names:
     maze, exit_pos = read_maze(maze_name, EXPERIMENT) 
-    visualize_all_best_paths(maze_name, 'Expected_Utility', (np.float64(0.2),1,1))
+    best_path_list = visualize_all_best_paths(maze_name, 'Expected_Utility', (np.float64(0.2),1,1))
+    best_path_dict[maze_name] = best_path_list
+p.pprint(best_path_dict)

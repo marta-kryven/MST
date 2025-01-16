@@ -39,6 +39,26 @@ maze_info_dict = {
         "exit_row" : -1,
         "exit_col" : -3,
     },
+
+    "corridors_to_three_tiny_rooms_with_alcoves": {
+        "subdir": "corridors_to_rooms_with_alcoves",
+        "fragment": [[0]], # TODO
+        "copies": [{"top left": (0,0), "reflect": False, "rotations": 0}], # TODO
+        "start_row": 2,
+        "start_col": 0,
+        "exit_row": 3,
+        "exit_col": -1,
+    },
+
+    "big_alcoves": {
+        "subdir": "big_alcoves",
+        "fragment": [[0]], # TODO
+        "copies": [{"top left": (0,0), "reflect": False, "rotations": 0}], # TODO
+        "start_row": 4,
+        "start_col": 0,
+        "exit_row": 0,
+        "exit_col": -1,
+    },
 }
 
 
@@ -391,28 +411,6 @@ maze_info_dict = {
     # exit_row = 3
     # exit_col = -1
 
-
-    # corridors to three tiny rooms with alcoves
-    # subdir = "corridors_to_rooms_with_alcoves"
-    # input_id = "corridors_to_three_tiny_rooms_with_alcoves"
-    # fragment = [[0]] # TODO
-    # copies = [{"top left": (0,0), "reflect": False, "rotations": 0}] # TODO
-    # start_row = 2
-    # start_col = 0
-    # exit_row = 3
-    # exit_col = -1
-
-    # ENV 5 = BIG ALCOVES
-
-    # big alcoves
-    # subdir = "big_alcoves"
-    # input_id = "big_alcoves"
-    # fragment = [[0]] # TODO
-    # copies = [{"top left": (0,0), "reflect": False, "rotations": 0}] # TODO
-    # start_row = 4
-    # start_col = 0
-    # exit_row = 0
-    # exit_col = -1
 
     # big alcoves
     # subdir = "big_alcoves"
