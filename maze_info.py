@@ -42,13 +42,38 @@ maze_info_dict = {
 
     "corridors_to_three_tiny_rooms_with_alcoves": {
         "subdir": "corridors_to_rooms_with_alcoves",
-        "fragment": [[0]], # TODO
-        "copies": [{"top left": (0,0), "reflect": False, "rotations": 0}], # TODO
+        "fragment": [
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1, 0],         
+        ],
+        "copies": [
+            {"top left": (0,2), "reflect": False, "rotations": 0},
+            {"top left": (3,2), "reflect": True, "rotations": 2},
+            {"top left": (6,2), "reflect": True, "rotations": 2},
+        ],
         "start_row": 2,
         "start_col": 0,
         "exit_row": 3,
         "exit_col": -1,
     },
+
+    "binary_7x7" : {
+        "subdir" : "binary_7x7",
+        "fragment" : [
+            [0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 0],
+        ],
+        "copies" : [
+            {"top left": (0,1), "reflect": False, "rotations": 0},
+            {"top left": (4,1), "reflect": True, "rotations": 2},
+        ],
+        "start_row" : 3,
+        "start_col" : 0,
+        "exit_row" : 1,
+        "exit_col" : -1,
+    },
+    
 
     "big_alcoves": {
         "subdir": "big_alcoves",
@@ -422,17 +447,6 @@ maze_info_dict = {
     # exit_row = 0
     # exit_col = -1
 
-    # ENV 6 = BINARY 7x7
-
-    # binary 7x7
-    # subdir = "binary_7x7"
-    # input_id = "binary_7x7"
-    # fragment = [[0]] # TODO
-    # copies = [{"top left": (0,0), "reflect": False, "rotations": 0}] # TODO
-    # start_row = 3
-    # start_col = 0
-    # exit_row = 1
-    # exit_col = -1
 
     # ENV 7-8 = H PAIR
 

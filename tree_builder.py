@@ -239,7 +239,7 @@ def maze2tree(maze, fragment = None, segmentation = {}):
                     if nid == 0:
                         # The current node has already been added and is
                         # identified with nid 0.
-                        # TODO: assuming for now the subtrees are nontrivial
+                        # stiching is not called when subtrees are trivial, so there are always children
                         for child in subtree_branch['children']:
                             stitch(child, node)
                     else:
@@ -278,8 +278,9 @@ def maze2tree(maze, fragment = None, segmentation = {}):
                             # exploration continues within the subtree
                             for child in subtree_branch['children']:
                                 stitch(child, new_node)
-                stitch(0)
-                continue # global exploration continues not from this node, but from the leaves of the subtree which have been added to the agenda.
+                if len(subtree.keys()) > 1: # An empty subtree would break the stitching logic
+                    stitch(0)
+                    continue # global exploration continues not from this node, but from the leaves of the subtree which have been added to the agenda.
             else:
                 # This case should only occur if we start in a fragment.
                 # Then it is probably reasonable to plan normally,

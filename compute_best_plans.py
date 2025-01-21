@@ -36,8 +36,8 @@ maze_names = [
     # "env17_c",
     # "6_units_flip",
     # "four_units_flip",
-    "6_units",
-    "four_units",
+    #"6_units",
+    #"four_units",
     # "6_units_vis1",
     # "four_units_vis1",
     # "big_alcoves",
@@ -46,9 +46,9 @@ maze_names = [
     # "test21",
     # "binary_7x7_rotated",
     # "test",
-    # "binary_7x7",
+    "binary_7x7",
     # "tiny_rooms",
-    # "corridors_to_three_tiny_rooms_with_alcoves",
+    #"corridors_to_three_tiny_rooms_with_alcoves",
 ]
 
 # TODO: move this somewhere it can be used commonly here and in maze2tree
@@ -137,12 +137,14 @@ for input_id in maze_names:
     gt_map = convert_to_mst_format(input_map)
 
     set_start(gt_map,start_row,start_col)
-    set_exit(gt_map,exit_row,exit_col)
+    
+    # Currently not setting exit so that exploration is full
+    #set_exit(gt_map,exit_row,exit_col)
 
     print(ut.array_to_string(gt_map))
 
     segmentation = pp.segment_map(fragment, copies)
-    print(segmentation)
+    #print(segmentation)
     print(f"Number of segmented cells: {len(segmentation.keys())}")
     fragment = convert_to_mst_format(fragment)
 
@@ -156,51 +158,42 @@ for input_id in maze_names:
 
     # Dump as an individual tree
     with open(f"__experiment_{EXPERIMENT}/trees/{input_id}.pickle", 'wb') as handle:
-            pickle.dump(tree, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(tree, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    # Dump as a 'unified' tree - as long as we're only testing one, just a dict wrapper
-    # with open(f'__experiment_{EXPERIMENT}/pickled_data/tree.pickle', 'wb') as handle:
-    #     tree['root'] = 0 # Apparently this is necessary
-    #     pickle.dump({input_id: tree}, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-    # Create a single unified tree (only needs to be done for the final maze added to the experiment)
-    def pickle_unified_tree():
-        print('pickled from unified tree')
-
-        subdir, dirs, maze_files = next(os.walk(f'__experiment_{EXPERIMENT}/mazes'))
-
-        tree = {}
-
-        for file_name in maze_files:
-            print(file_name)
-            maze_name = file_name.split('.')[0]
-
-            try:
-                with open(f'__experiment_{EXPERIMENT}/trees/{maze_name}.pickle', 'rb') as handle:
-                    tree_ = pickle.load(handle)
-                    print(maze_name, len(tree_))
-            except FileNotFoundError:
-                continue
-
-            tree_['root'] = 0
-            tree[maze_name] = tree_
-            print(maze_name)
-
-        with open(f'__experiment_{EXPERIMENT}/pickled_data/tree.pickle', 'wb') as handle:
-            pickle.dump(tree, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-    pickle_unified_tree()
-
-    # TODO: This seems actually incorrect, mazes here should be in tree builder's form like gt_map
-    # shutil.copyfile(
-    #     f"/home/cwyeth/Desktop/compositional_map_synthesis/test_patterns/{subdir}/{input_id}.txt", 
-    #     f"__experiment_{EXPERIMENT}/mazes/{input_id}.txt",
-    # )
     # This doubles as converting maps to the MST format which we'll want to switch to anyway:
     # includes start and exit as well. 
     with open(f"__experiment_{EXPERIMENT}/mazes/{input_id}.txt", 'w') as f:
         for row in gt_map:
             f.write("".join(map(str, row)) + "\n")
+
+# Create a single unified tree (only needs to be done for the final maze added to the experiment)
+def pickle_unified_tree():
+    print('pickled from unified tree')
+
+    subdir, dirs, maze_files = next(os.walk(f'__experiment_{EXPERIMENT}/mazes'))
+
+    tree = {}
+
+    for file_name in maze_files:
+        print(file_name)
+        maze_name = file_name.split('.')[0]
+
+        try:
+            with open(f'__experiment_{EXPERIMENT}/trees/{maze_name}.pickle', 'rb') as handle:
+                tree_ = pickle.load(handle)
+                print(maze_name, len(tree_))
+        except FileNotFoundError:
+            continue
+
+        tree_['root'] = 0
+        tree[maze_name] = tree_
+        print(maze_name)
+
+    with open(f'__experiment_{EXPERIMENT}/pickled_data/tree.pickle', 'wb') as handle:
+        pickle.dump(tree, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+pickle_unified_tree()
+
 
 ##########################################################################################
 # PHASE 2: Construct dict of optimal plans 
@@ -683,8 +676,6 @@ def visualize_nodevalues(maze_name, pid, parameters, param_indx, node_value_func
 
     tree = TREE[maze_name]
 
-    print(tree)
-
     if ax is None:
         _, ax = plt.subplots(1)
 
@@ -815,9 +806,12 @@ def visualize_nodes_path(maze_name, nodes_path, ax=None):
     visualize_maze(maze, exit_pos, ax)
 
     full_path = []
+    concise_path = []
     for nid in nodes_path:
 
         path = tree[nid]['path_from_par']
+        if len(path) > 0: # TODO: could also include start position from first non-empty path
+            concise_path.append(path[-1])
         full_path.extend(path)
         if path:
             row_vals, col_vals = zip(*path)
@@ -826,7 +820,7 @@ def visualize_nodes_path(maze_name, nodes_path, ax=None):
 
     ax.legend(loc='upper left', bbox_to_anchor=(1,1))
     #print(full_path)
-    return full_path
+    return full_path, concise_path
 
 def visualize_popular_subject_nodes_paths(maze_name):
 
@@ -890,10 +884,9 @@ def visualize_all_best_paths(maze_name, model_name, param):
     best_path_list = []
     for (nodes_path, path_value), ax in zip(nodes_paths, axs):
     
-        visualize_maze(maze, ax=ax) 
-        best_path_list.append(
-            visualize_nodes_path(maze_name, nodes_path, ax=ax),
-        )
+        visualize_maze(maze, ax=ax)
+        full_path, concise_path = visualize_nodes_path(maze_name, nodes_path, ax=ax) 
+        best_path_list.append(concise_path)
         # This crowds the plot far too much
         #ax.set_title(f'{model_name} | {param} | {round(path_value,3)}')
 
