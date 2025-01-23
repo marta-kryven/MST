@@ -23,30 +23,30 @@ from tree_builder import maze2tree
 from maze_info import maze_info_dict
 
 
-# 5 is for modular planning, 6 is ordinary optimal planning
-EXPERIMENT = 6
+# optimal, modular, or heuristic
+EXPERIMENT = 'optimal'
 
 # Mazes desired
 maze_names = [
-    # "5_units",
+    #"5_units",
     # "env17_a1"
     # "5_units_vis1",
     # "env17_b",
     # "6_units_b1",
     # "env17_c",
     # "6_units_flip",
-    # "four_units_flip",
+    #"four_units_flip",
     #"6_units",
     #"four_units",
     # "6_units_vis1",
     # "four_units_vis1",
-    # "big_alcoves",
+    "big_alcoves",
     # "test11",
     # "big_alcoves_vis1",
     # "test21",
     # "binary_7x7_rotated",
     # "test",
-    "binary_7x7",
+    #"binary_7x7",
     # "tiny_rooms",
     #"corridors_to_three_tiny_rooms_with_alcoves",
 ]
@@ -63,15 +63,18 @@ class Cell(enum.Enum):
 for input_id in maze_names:
 
     # Recover necessary maze info
-    subdir = maze_info_dict[input_id]["subdir"]
+    #subdir = maze_info_dict[input_id]["subdir"]
     fragment = maze_info_dict[input_id]["fragment"]
     copies = maze_info_dict[input_id]["copies"]
-    start_row = maze_info_dict[input_id]["start_row"]
-    start_col = maze_info_dict[input_id]["start_col"]
-    exit_row = maze_info_dict[input_id]["exit_row"]
-    exit_col = maze_info_dict[input_id]["exit_col"]
+    # start_row = maze_info_dict[input_id]["start_row"]
+    # start_col = maze_info_dict[input_id]["start_col"]
+    # exit_row = maze_info_dict[input_id]["exit_row"]
+    # exit_col = maze_info_dict[input_id]["exit_col"]
 
-    input_map = pattern_editor.read_pattern(f'/home/cwyeth/Desktop/compositional_map_synthesis/test_patterns/{subdir}/{input_id}.txt')
+    input_map = pattern_editor.read_pattern(f'/home/cwyeth/Desktop/compositional_map_synthesis/experiment_Jan_2024/maps/{input_id}.txt')
+    # The first two rows are dimensions in the experiment dir, drop them
+    input_map = input_map[2:]
+    #input_map = pattern_editor.read_pattern(f'/home/cwyeth/Desktop/compositional_map_synthesis/test_patterns/{subdir}/{input_id}.txt')
     input_dims = (len(input_map), len(input_map[0]))
     str_map = ut.array_to_string(input_map)
 
@@ -90,8 +93,31 @@ for input_id in maze_names:
         score = ut.structural_mdl_score(fragment, copies, errors, omissions)
         print(f"Score: {score}")
 
+    def convert_to_modular_format(map):
+        """
+        Converts a map in mst fragment format to modular expected format.
+        Does not handle setting a start position, exit, or making any observations.
+        """
+        def convert(cell):
+            if cell in [
+                Cell.UNOBSERVED_EMPTY.value,
+                Cell.HIDDEN_EXIT.value,
+                Cell.START.value
+            ]:
+                return 0
+            elif cell == Cell.WALL.value:
+                return 1
+            elif cell == Cell.OBSERVED_EMPTY.value:
+                return 2
+            else:
+                raise Exception(
+                    "Case not implement, perhaps an omitted cell",
+                )
+        return [[convert(cell) for cell in row] for row in map]
+    mod_map = convert_to_modular_format(input_map)
+
     print(str_map)
-    ut.plot_pattern(input_map, "input")
+    ut.plot_pattern(mod_map, "input")
 
 
     output = regenerate_pattern(fragment, copies, input_dims)
@@ -134,9 +160,11 @@ for input_id in maze_names:
         else:
             map[i][j] = Cell.HIDDEN_EXIT.value   
 
-    gt_map = convert_to_mst_format(input_map)
+    #gt_map = convert_to_mst_format(input_map)
+    gt_map = input_map
 
-    set_start(gt_map,start_row,start_col)
+    # TODO: start should already be set
+    #set_start(gt_map,start_row,start_col)
     
     # Currently not setting exit so that exploration is full
     #set_exit(gt_map,exit_row,exit_col)
@@ -149,7 +177,7 @@ for input_id in maze_names:
     fragment = convert_to_mst_format(fragment)
 
     print(segmentation.keys())
-    if EXPERIMENT == 5:
+    if EXPERIMENT == 'modular':
         tree = maze2tree(gt_map, fragment, segmentation)
     else:
         tree = maze2tree(gt_map)
@@ -795,7 +823,7 @@ def visualize_nodes_path(maze_name, nodes_path, ax=None):
 
     def rand_jitter(arr):
         """ given array, jitter the values so that same values don't overlap """
-        stdev = .04 * (max(arr) - min(arr))
+        stdev = .05 * (max(arr) - min(arr))
         return arr + np.random.randn(len(arr)) * stdev
 
     if ax is None:
@@ -901,6 +929,12 @@ def visualize_all_best_paths(maze_name, model_name, param):
 best_path_dict = {}
 for maze_name in maze_names:
     maze, exit_pos = read_maze(maze_name, EXPERIMENT) 
-    best_path_list = visualize_all_best_paths(maze_name, 'Expected_Utility', (np.float64(0.2),1,1))
+    if EXPERIMENT in ['optimal','modular']:
+        best_path_list = visualize_all_best_paths(maze_name, 'Expected_Utility', (np.float64(0.2),1,1))
+    elif EXPERIMENT == 'heuristic':
+        best_path_list = visualize_all_best_paths(maze_name, 'Heuristic_Steps', (np.float64(0.2),1))
     best_path_dict[maze_name] = best_path_list
 p.pprint(best_path_dict)
+with open(f'__experiment_{EXPERIMENT}/pickled_data/best_path.pickle', 'wb') as handle:
+    print(f'pickling best_path to __experiment_{EXPERIMENT}/pickled_data/best_path.pickle')
+    pickle.dump(best_path_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)

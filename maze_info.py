@@ -1,13 +1,60 @@
+# TODO:
+    # "env17_a1"
+    # "5_units_vis1",
+    # "env17_b",
+    # "6_units_b1",
+    # "env17_c",
+    # "6_units_flip",
+    # "6_units_vis1",
+    # "four_units_vis1",
+    # "big_alcoves",
+    # "test11",
+    # "big_alcoves_vis1",
+    # "test21",
+    # "binary_7x7_rotated",
+    # "test",
+    # "tiny_rooms",
+
 # EXAMPLES WITH INTENDED SEGMENTATION
 maze_info_dict = {
+    "5_units": {
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (1,0), "reflect": False, "rotations": 0},
+            {"top left": (1,3), "reflect": False, "rotations": 0},
+            {"top left": (1,6), "reflect": False, "rotations": 0},
+            {"top left": (1,9), "reflect": False, "rotations": 0},
+            {"top left": (1,12), "reflect": False, "rotations": 0},
+        ],
+    },
     "four_units": {
         "subdir": "four_units",
-        "fragment": [[0]], # TODO
-        "copies": [{"top left": (0,0), "reflect": False, "rotations": 0}], # TODO
-        "start_row": 3,
-        "start_col": 0,
-        "exit_row": 0,
-        "exit_col": -1,
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,3), "reflect": False, "rotations": 0},
+            {"top left": (0,7), "reflect": False, "rotations": 0},
+            {"top left": (5,0), "reflect": False, "rotations": 0},
+            {"top left": (5,4), "reflect": False, "rotations": 0},
+        ],
+    },
+
+    "four_units_flip": {
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+            {"top left": (0,4), "reflect": False, "rotations": 0},
+            {"top left": (5,3), "reflect": False, "rotations": 0},
+            {"top left": (5,7), "reflect": False, "rotations": 0},
+        ],
     },
 
     "6_units" : {
@@ -24,20 +71,12 @@ maze_info_dict = {
             {"top left": (7,4), "reflect": False, "rotations": 0},
             {"top left": (7,7), "reflect": False, "rotations": 0},
         ],
-        "start_row" : 4,
-        "start_col" : 0,
-        "exit_row" : 0,
-        "exit_col" : 7,
     },
 
     "two_arms_5x7" : {
         "subdir" : "two_arms",
         "fragment" : [[0]], # TODO
         "copies" : [{"top left": (0,0), "reflect": False, "rotations": 0}], # TODO
-        "start_row" : 0,
-        "start_col" : 3,
-        "exit_row" : -1,
-        "exit_col" : -3,
     },
 
     "corridors_to_three_tiny_rooms_with_alcoves": {
@@ -51,10 +90,6 @@ maze_info_dict = {
             {"top left": (3,2), "reflect": True, "rotations": 2},
             {"top left": (6,2), "reflect": True, "rotations": 2},
         ],
-        "start_row": 2,
-        "start_col": 0,
-        "exit_row": 3,
-        "exit_col": -1,
     },
 
     "binary_7x7" : {
@@ -68,10 +103,6 @@ maze_info_dict = {
             {"top left": (0,1), "reflect": False, "rotations": 0},
             {"top left": (4,1), "reflect": True, "rotations": 2},
         ],
-        "start_row" : 3,
-        "start_col" : 0,
-        "exit_row" : 1,
-        "exit_col" : -1,
     },
     
 
@@ -79,10 +110,6 @@ maze_info_dict = {
         "subdir": "big_alcoves",
         "fragment": [[0]], # TODO
         "copies": [{"top left": (0,0), "reflect": False, "rotations": 0}], # TODO
-        "start_row": 4,
-        "start_col": 0,
-        "exit_row": 0,
-        "exit_col": -1,
     },
 }
 
