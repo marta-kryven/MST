@@ -23,31 +23,30 @@ from tree_builder import maze2tree
 from maze_info import maze_info_dict
 
 
-# optimal, modular, or heuristic
-EXPERIMENT = 'optimal'
+EXPERIMENT = 'aggregate_comparison'
 
 # Mazes desired
 maze_names = [
-    #"5_units",
+    # "5_units",
     # "env17_a1"
     # "5_units_vis1",
     # "env17_b",
     # "6_units_b1",
     # "env17_c",
     # "6_units_flip",
-    #"four_units_flip",
+    "four_units_flip",
     #"6_units",
     #"four_units",
     # "6_units_vis1",
     # "four_units_vis1",
-    "big_alcoves",
+    #"big_alcoves",
     # "test11",
     # "big_alcoves_vis1",
     # "test21",
     # "binary_7x7_rotated",
-    # "test",
+    #"test",
     #"binary_7x7",
-    # "tiny_rooms",
+    "tiny_rooms", # apparently has internal structure?
     #"corridors_to_three_tiny_rooms_with_alcoves",
 ]
 
@@ -58,6 +57,8 @@ class Cell(enum.Enum):
     OBSERVED_EMPTY = 6
     HIDDEN_EXIT = 2
     START = 5
+
+segmentations = dict()
 
 # Construct each tree
 for input_id in maze_names:
@@ -172,15 +173,15 @@ for input_id in maze_names:
     print(ut.array_to_string(gt_map))
 
     segmentation = pp.segment_map(fragment, copies)
+    segmentations[input_id] = segmentation
     #print(segmentation)
     print(f"Number of segmented cells: {len(segmentation.keys())}")
     fragment = convert_to_mst_format(fragment)
 
     print(segmentation.keys())
-    if EXPERIMENT == 'modular':
-        tree = maze2tree(gt_map, fragment, segmentation)
-    else:
-        tree = maze2tree(gt_map)
+    # if EXPERIMENT == 'modular':
+    #     tree = maze2tree(gt_map, fragment, segmentation)
+    tree = maze2tree(gt_map)
     print(f"Tree size: {len(tree.keys())}")
     # print(tree)
 
@@ -267,6 +268,7 @@ MODEL_NAMES = [
     'Heuristic_Steps',
     'Heuristic_Cells',
     'Heuristic_Steps_Cells',
+    'Naive_Modular',
     #    'Random', 
         #'Sampling',# # this model is generated from sample_model.py, it is very slow!
     #    'EU_Numerosity',
@@ -289,7 +291,8 @@ MODEL_NAMES_ABREV = {'Expected_Utility': 'EU',
                      'DU_Numerosity' : 'DU_Num',
                      'Steps_Numerosity': 'HS_Num',
                      'Cells_Numerosity': 'HC_Num',
-                     'Steps_Cells_Numerosity': 'HSC_Num'
+                     'Steps_Cells_Numerosity': 'HSC_Num',
+                     'Naive_Modular': 'NM',
                     }
 
 # which parameter ranges should be fitted to each model
@@ -307,7 +310,8 @@ MODEL2PARAMS = {
                 'DU_Numerosity': [(round(tau,3), round(gamma,3), 1, b) for tau in TAUS for gamma in GAMMAS for b in Bs],
                 'Steps_Numerosity': [(round(tau,3), 1, b) for tau in TAUS for b in Bs],
                 'Cells_Numerosity': [(round(tau,3), 0, b) for tau in TAUS for b in Bs],
-                'Steps_Cells_Numerosity': [(round(tau,3), round(kappa,3), b) for tau in TAUS for kappa in KAPPAS for b in Bs]
+                'Steps_Cells_Numerosity': [(round(tau,3), round(kappa,3), b) for tau in TAUS for kappa in KAPPAS for b in Bs],
+                'Naive_Modular': [(round(tau,3), 1) for tau in TAUS],
                }
 
 # tree is generated from maze maps using tree_builder.py
@@ -433,6 +437,28 @@ def node_value_heuristic(maze_name, nid, kappa=1, bit_threshold = -1):
 
     return steps*kappa - cells*(1-kappa)
 
+# @memoize
+def node_value_modular(maze_name, nid, kappa=1, bit_threshold = -1):
+    ''' if 0<kappa<1 this is steps-cells heuristic, '''
+    ''' if kappa=1 this is a steps heuristic '''
+    ''' if kappa=0 this is a cells heuristic '''
+
+    tree = TREE[maze_name]
+    segmentation = segmentations[maze_name]
+    steps = tree[nid]["steps_from_par"]
+    cells = len(tree[nid]["celldistances"])
+    
+    if bit_threshold!= -1:
+        steps = numerosity_table[bit_threshold][steps]
+        cells = numerosity_table[bit_threshold][cells]
+
+    if tree[nid]['pos'] in segmentation:
+        return steps*kappa - cells*(1-kappa)
+    else:
+        return min(
+            [node_value_modular(maze_name, chid, kappa, bit_threshold) for chid in tree[nid]['children']]
+        )
+
 
 def node_value_random(maze_name, nid):
 
@@ -519,7 +545,8 @@ MODEL2RAWNODEVAL = {
                 'DU_Numerosity': node_value_plan,
                 'Steps_Numerosity': node_value_heuristic,
                 'Cells_Numerosity': node_value_heuristic,
-                'Steps_Cells_Numerosity': node_value_heuristic
+                'Steps_Cells_Numerosity': node_value_heuristic,
+                'Naive_Modular': node_value_modular,
                 }
 
 print(f'generating values into pickle Experiment: {EXPERIMENT}, Model Type: {MODEL_TYPE}')
@@ -926,15 +953,78 @@ def visualize_all_best_paths(maze_name, model_name, param):
 # PHASE 3: Extract all optimal plans for each maze
 ##########################################################################################    
 
+algorithm = 'optimal'
+
 best_path_dict = {}
 for maze_name in maze_names:
     maze, exit_pos = read_maze(maze_name, EXPERIMENT) 
-    if EXPERIMENT in ['optimal','modular']:
+    if algorithm in ['optimal','modular']:
         best_path_list = visualize_all_best_paths(maze_name, 'Expected_Utility', (np.float64(0.2),1,1))
-    elif EXPERIMENT == 'heuristic':
+    elif algorithm == 'heuristic':
         best_path_list = visualize_all_best_paths(maze_name, 'Heuristic_Steps', (np.float64(0.2),1))
     best_path_dict[maze_name] = best_path_list
 p.pprint(best_path_dict)
 with open(f'__experiment_{EXPERIMENT}/pickled_data/best_path.pickle', 'wb') as handle:
     print(f'pickling best_path to __experiment_{EXPERIMENT}/pickled_data/best_path.pickle')
     pickle.dump(best_path_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+##########################################################################################
+# PHASE 4: Score agreement between subjects and each algorithm
+##########################################################################################    
+
+algorithms = [
+    'optimal',
+    'modular',
+    'heuristic',
+]
+
+algorithm_to_param = {
+    'optimal' : (np.float64(0.2), 1, 1),
+    'modular' : (np.float64(0.2), 1),
+    'heuristic' : (np.float64(0.2), 1), 
+}
+
+algorithm_to_value_path = {
+    'optimal' : f'Expected_Utility/node_values_{algorithm_to_param["optimal"]}.pickle',
+    'modular' : f'Naive_Modular/node_values_{algorithm_to_param["heuristic"]}.pickle',
+    'heuristic' : f'Heuristic_Steps/node_values_{algorithm_to_param["heuristic"]}.pickle',  
+}
+# Load the subject decisions
+with open('../compositional_map_synthesis/experiment_Jan_2024/pickled_data/subject_decisions.pickle', 'rb') as handle:
+    subject_decisions = pickle.load(handle)
+# Load the corresponding tree to extract coordinates
+with open('../compositional_map_synthesis/experiment_Jan_2024/pickled_data/tree.pickle', 'rb') as handle:
+    tree = pickle.load(handle)
+
+# Index id -> maze -> list of matching algorithms
+subj_matches = dict()
+for id in subject_decisions.keys():
+    print(f'subject_id: {id}')
+    subj_matches[id] = dict()
+    for maze_name in maze_names:
+        print(f'maze_name: {maze_name}')
+        subj_matches[id][maze_name] = []
+        node_path = subject_decisions[id][maze_name]['nodes']
+        print(node_path)
+        for algorithm in algorithms:
+            # the node_value data structure redundantly requires the parameters,
+            # though they are in fact already a part of the file name.
+            param = algorithm_to_param[algorithm]
+            full_path = os.path.join(
+                f'__experiment_{EXPERIMENT}/node_values_recursive/',
+                algorithm_to_value_path[algorithm],
+            )
+            with open(full_path, 'rb') as handle:
+                node_vals = pickle.load(handle)[maze_name]
+            agreements = 0
+            diagnostic_decisions = 0
+            for si, nid in enumerate(node_path[:-1]):
+                if len(tree[maze_name][nid]['children']) > 1: # will not appear unless it has mutliple children
+                    actual_choice_value = node_vals[nid][param][node_path[si+1]]
+                    made_best_choice = True
+                    for chid in node_vals[nid][param].keys():
+                        if node_vals[nid][param][chid] > actual_choice_value:
+                            made_best_choice = False
+                    diagnostic_decisions += 1
+                    agreements += int(made_best_choice)
+            print(f'{agreements}/{diagnostic_decisions} agree with {algorithm}')

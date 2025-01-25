@@ -7,17 +7,69 @@
     # "6_units_flip",
     # "6_units_vis1",
     # "four_units_vis1",
-    # "big_alcoves",
     # "test11",
     # "big_alcoves_vis1",
     # "test21",
     # "binary_7x7_rotated",
     # "test",
-    # "tiny_rooms",
 
 # EXAMPLES WITH INTENDED SEGMENTATION
 maze_info_dict = {
-    "5_units": {
+    "env17_a1": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "5_units": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "5_units_vis1": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "env17_b": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "env17_a1": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "env17_c": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "6_units_b1": {
         "fragment": [
             [0,0],
             [0,0],
@@ -28,6 +80,89 @@ maze_info_dict = {
             {"top left": (1,6), "reflect": False, "rotations": 0},
             {"top left": (1,9), "reflect": False, "rotations": 0},
             {"top left": (1,12), "reflect": False, "rotations": 0},
+        ],
+    },
+    "6_units_flip": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "6_units_vis1": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "four_units_vis1": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "test11": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "big_alcoves_vis1": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "test21": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "binary_7x7_rotated": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "test": { # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+        ],
+    },
+    "tiny_rooms": {
+        "fragment": [
+            [1,1,1,1,0,1,0],
+            [0,0,0,0,0,0,0],
+        ],
+        "copies": [
+            {"top left": (0,1), "reflect": False, "rotations": 0},
+            {"top left": (3,1), "reflect": False, "rotations": 0},
+            {"top left": (6,1), "reflect": False, "rotations": 0},
         ],
     },
     "four_units": {
@@ -108,8 +243,16 @@ maze_info_dict = {
 
     "big_alcoves": {
         "subdir": "big_alcoves",
-        "fragment": [[0]], # TODO
-        "copies": [{"top left": (0,0), "reflect": False, "rotations": 0}], # TODO
+        "fragment": [
+            [0,0],
+            [0,0],
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,8), "reflect": False, "rotations": 0},
+            {"top left": (5,8), "reflect": False, "rotations": 0},
+        ],
     },
 }
 
