@@ -27,27 +27,27 @@ EXPERIMENT = 'aggregate_comparison'
 
 # Mazes desired
 maze_names = [
-    # "5_units",
-    # "env17_a1"
-    # "5_units_vis1",
-    # "env17_b",
-    # "6_units_b1",
-    # "env17_c",
-    # "6_units_flip",
+    "5_units",#
+    "env17_a1",#
+    "5_units_vis1",#
+    "env17_b",#
+    "6_units_b1",#
+    "env17_c",#
+    "6_units_flip",#
     "four_units_flip",
-    #"6_units",
-    #"four_units",
-    # "6_units_vis1",
-    # "four_units_vis1",
-    #"big_alcoves",
-    # "test11",
-    # "big_alcoves_vis1",
-    # "test21",
-    # "binary_7x7_rotated",
-    #"test",
-    #"binary_7x7",
+    "6_units",
+    "four_units",
+    "6_units_vis1",#
+    "four_units_vis1",#
+    "big_alcoves",
+    #"test11", # TODO
+    "big_alcoves_vis1",#
+    "test21",#
+    "binary_7x7_rotated",#
+    "test",
+    "binary_7x7",
     "tiny_rooms", # apparently has internal structure?
-    #"corridors_to_three_tiny_rooms_with_alcoves",
+    "corridors_to_three_tiny_rooms_with_alcoves",
 ]
 
 # TODO: move this somewhere it can be used commonly here and in maze2tree
@@ -1003,7 +1003,7 @@ for id in subject_decisions.keys():
     subj_matches[id] = dict()
     for maze_name in maze_names:
         print(f'maze_name: {maze_name}')
-        subj_matches[id][maze_name] = []
+        subj_matches[id][maze_name] = dict()
         node_path = subject_decisions[id][maze_name]['nodes']
         print(node_path)
         for algorithm in algorithms:
@@ -1028,3 +1028,8 @@ for id in subject_decisions.keys():
                     diagnostic_decisions += 1
                     agreements += int(made_best_choice)
             print(f'{agreements}/{diagnostic_decisions} agree with {algorithm}')
+            subj_matches[id][maze_name][algorithm] = {'agreements': agreements, 'diagnostic_decisions': diagnostic_decisions}
+
+p.pprint(subj_matches)
+with open('../compositional_map_synthesis/experiment_Jan_2024/algorithm_matches.pickle', 'wb') as handle:
+    pickle.dump(subj_matches, handle, pickle.HIGHEST_PROTOCOL)

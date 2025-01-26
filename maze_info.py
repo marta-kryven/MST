@@ -15,61 +15,19 @@
 
 # EXAMPLES WITH INTENDED SEGMENTATION
 maze_info_dict = {
-    "env17_a1": { # TODO
+    "env17_a1": {
         "fragment": [
-            [0,0],
-            [0,0],
+            [1,0,1],
+            [0,0,0],
         ],
         "copies": [
-            {"top left": (0,0), "reflect": False, "rotations": 0},
+            {"top left": (1,0), "reflect": False, "rotations": 0},
+            {"top left": (5,0), "reflect": False, "rotations": 0},
+            {"top left": (3,4), "reflect": False, "rotations": 0},
+            {"top left": (7,4), "reflect": False, "rotations": 0},
         ],
     },
-    "5_units": { # TODO
-        "fragment": [
-            [0,0],
-            [0,0],
-        ],
-        "copies": [
-            {"top left": (0,0), "reflect": False, "rotations": 0},
-        ],
-    },
-    "5_units_vis1": { # TODO
-        "fragment": [
-            [0,0],
-            [0,0],
-        ],
-        "copies": [
-            {"top left": (0,0), "reflect": False, "rotations": 0},
-        ],
-    },
-    "env17_b": { # TODO
-        "fragment": [
-            [0,0],
-            [0,0],
-        ],
-        "copies": [
-            {"top left": (0,0), "reflect": False, "rotations": 0},
-        ],
-    },
-    "env17_a1": { # TODO
-        "fragment": [
-            [0,0],
-            [0,0],
-        ],
-        "copies": [
-            {"top left": (0,0), "reflect": False, "rotations": 0},
-        ],
-    },
-    "env17_c": { # TODO
-        "fragment": [
-            [0,0],
-            [0,0],
-        ],
-        "copies": [
-            {"top left": (0,0), "reflect": False, "rotations": 0},
-        ],
-    },
-    "6_units_b1": {
+    "5_units": {
         "fragment": [
             [0,0],
             [0,0],
@@ -82,7 +40,103 @@ maze_info_dict = {
             {"top left": (1,12), "reflect": False, "rotations": 0},
         ],
     },
-    "6_units_flip": { # TODO
+    "5_units_vis1": {
+        "fragment": [
+            [2,2],
+            [2,2],
+        ],
+        "copies": [
+            {"top left": (0,1), "reflect": False, "rotations": 0},
+            {"top left": (0,4), "reflect": False, "rotations": 0},
+            {"top left": (0,7), "reflect": False, "rotations": 0},
+            {"top left": (5,3), "reflect": False, "rotations": 0},
+            {"top left": (5,6), "reflect": False, "rotations": 0},
+        ],
+    },
+    "env17_b": {
+        "fragment": [
+            [1,2,1],
+            [2,2,2],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+            {"top left": (3,0), "reflect": False, "rotations": 0},
+            {"top left": (6,0), "reflect": False, "rotations": 0},
+            {"top left": (0,4), "reflect": False, "rotations": 0},
+            {"top left": (3,4), "reflect": False, "rotations": 0},
+            {"top left": (6,4), "reflect": False, "rotations": 0},
+        ],
+    },
+    "env17_c": {
+        "fragment": [
+            [1,2],
+            [2,2],
+            [1,2],
+        ],
+        "copies": [
+            {"top left": (0,0), "reflect": False, "rotations": 0},
+            {"top left": (0,3), "reflect": False, "rotations": 0},
+            {"top left": (0,6), "reflect": False, "rotations": 0},
+            {"top left": (0,9), "reflect": False, "rotations": 0},
+            {"top left": (0,12), "reflect": False, "rotations": 0},
+        ],
+    },
+    "6_units_b1": {
+        "fragment": [
+            [2,2],
+            [2,2],
+            [2,2],
+        ],
+        "copies": [
+            {"top left": (0,1), "reflect": False, "rotations": 0},
+            {"top left": (0,4), "reflect": False, "rotations": 0},
+            {"top left": (0,7), "reflect": False, "rotations": 0},
+            {"top left": (0,10), "reflect": False, "rotations": 0},
+            {"top left": (0,13), "reflect": False, "rotations": 0},
+            {"top left": (0,16), "reflect": False, "rotations": 0},
+        ],
+    },
+    "6_units_flip": {
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,1), "reflect": False, "rotations": 0},
+            {"top left": (0,4), "reflect": False, "rotations": 0},
+            {"top left": (0,7), "reflect": False, "rotations": 0},
+            {"top left": (5,2), "reflect": False, "rotations": 0},
+            {"top left": (5,5), "reflect": False, "rotations": 0},
+            {"top left": (5,8), "reflect": False, "rotations": 0},
+        ],
+    },
+    "6_units_vis1": {
+        "fragment": [
+            [0,0],
+            [0,2],
+        ],
+        "copies": [
+            {"top left": (0,1), "reflect": False, "rotations": 0},
+            {"top left": (0,4), "reflect": False, "rotations": 0},
+            {"top left": (0,7), "reflect": False, "rotations": 0},
+            {"top left": (7,1), "reflect": False, "rotations": 1},
+            {"top left": (7,4), "reflect": False, "rotations": 1},
+            {"top left": (7,7), "reflect": False, "rotations": 1},
+        ],
+    },
+    "four_units_vis1": {
+        "fragment": [
+            [0,0],
+            [0,0],
+        ],
+        "copies": [
+            {"top left": (0,3), "reflect": False, "rotations": 0},
+            {"top left": (0,7), "reflect": False, "rotations": 0},
+            {"top left": (5,0), "reflect": False, "rotations": 0},
+            {"top left": (5,4), "reflect": False, "rotations": 0},
+        ],
+    },
+    "test11": { # TODO has multiple fragments
         "fragment": [
             [0,0],
             [0,0],
@@ -91,67 +145,58 @@ maze_info_dict = {
             {"top left": (0,0), "reflect": False, "rotations": 0},
         ],
     },
-    "6_units_vis1": { # TODO
+    "big_alcoves_vis1": {
         "fragment": [
+            [0,0],
+            [2,2],
             [0,0],
             [0,0],
         ],
         "copies": [
-            {"top left": (0,0), "reflect": False, "rotations": 0},
+            {"top left": (0,8), "reflect": False, "rotations": 0},
+            {"top left": (5,8), "reflect": False, "rotations": 2},
         ],
     },
-    "four_units_vis1": { # TODO
+    "test21": {
         "fragment": [
             [0,0],
             [0,0],
         ],
         "copies": [
-            {"top left": (0,0), "reflect": False, "rotations": 0},
+            {"top left": (1,0), "reflect": False, "rotations": 0},
+            {"top left": (1,3), "reflect": False, "rotations": 0},
+            {"top left": (1,6), "reflect": False, "rotations": 0},
+            {"top left": (1,9), "reflect": False, "rotations": 0},
+            {"top left": (1,12), "reflect": False, "rotations": 0},
+            {"top left": (1,15), "reflect": False, "rotations": 0},
         ],
     },
-    "test11": { # TODO
+    "binary_7x7_rotated": {
         "fragment": [
-            [0,0],
-            [0,0],
+            [0,0,0],
+            [0,1,1],
+            [0,1,1],
+            [0,1,1],
+            [0,1,1],
+            [0,1,1],
         ],
         "copies": [
             {"top left": (0,0), "reflect": False, "rotations": 0},
+            {"top left": (0,4), "reflect": True, "rotations": 0},
         ],
     },
-    "big_alcoves_vis1": { # TODO
+    "test": {
         "fragment": [
             [0,0],
             [0,0],
         ],
         "copies": [
             {"top left": (0,0), "reflect": False, "rotations": 0},
-        ],
-    },
-    "test21": { # TODO
-        "fragment": [
-            [0,0],
-            [0,0],
-        ],
-        "copies": [
-            {"top left": (0,0), "reflect": False, "rotations": 0},
-        ],
-    },
-    "binary_7x7_rotated": { # TODO
-        "fragment": [
-            [0,0],
-            [0,0],
-        ],
-        "copies": [
-            {"top left": (0,0), "reflect": False, "rotations": 0},
-        ],
-    },
-    "test": { # TODO
-        "fragment": [
-            [0,0],
-            [0,0],
-        ],
-        "copies": [
-            {"top left": (0,0), "reflect": False, "rotations": 0},
+            {"top left": (0,3), "reflect": False, "rotations": 0},
+            {"top left": (0,6), "reflect": False, "rotations": 0},
+            {"top left": (5,0), "reflect": False, "rotations": 0},
+            {"top left": (5,3), "reflect": False, "rotations": 0},
+            {"top left": (5,6), "reflect": False, "rotations": 0},
         ],
     },
     "tiny_rooms": {
@@ -255,6 +300,20 @@ maze_info_dict = {
         ],
     },
 }
+
+    # "6_units_b1": {
+    #     "fragment": [
+    #         [0,0],
+    #         [0,0],
+    #     ],
+    #     "copies": [
+    #         {"top left": (1,0), "reflect": False, "rotations": 0},
+    #         {"top left": (1,3), "reflect": False, "rotations": 0},
+    #         {"top left": (1,6), "reflect": False, "rotations": 0},
+    #         {"top left": (1,9), "reflect": False, "rotations": 0},
+    #         {"top left": (1,12), "reflect": False, "rotations": 0},
+    #     ],
+    # },
 
 
     # ENV 15 = THREE ROOMS WITH CLOSETS
