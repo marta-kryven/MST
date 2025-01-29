@@ -27,23 +27,23 @@ EXPERIMENT = 'aggregate_comparison'
 
 # Mazes desired
 maze_names = [
-    "5_units",#
-    "env17_a1",#
-    "5_units_vis1",#
-    "env17_b",#
-    "6_units_b1",#
-    "env17_c",#
-    "6_units_flip",#
+    "5_units",
+    "env17_a1",
+    "5_units_vis1",
+    "env17_b",
+    "6_units_b1",
+    "env17_c",
+    "6_units_flip",
     "four_units_flip",
     "6_units",
     "four_units",
-    "6_units_vis1",#
-    "four_units_vis1",#
+    "6_units_vis1",
+    "four_units_vis1",
     "big_alcoves",
     #"test11", # TODO
-    "big_alcoves_vis1",#
-    "test21",#
-    "binary_7x7_rotated",#
+    "big_alcoves_vis1",
+    "test21",
+    "binary_7x7_rotated",
     "test",
     "binary_7x7",
     "tiny_rooms", # apparently has internal structure?
@@ -118,12 +118,16 @@ for input_id in maze_names:
     mod_map = convert_to_modular_format(input_map)
 
     print(str_map)
-    ut.plot_pattern(mod_map, "input")
+    
+    # PLOT MAP
+    #ut.plot_pattern(mod_map, "input")
 
 
     output = regenerate_pattern(fragment, copies, input_dims)
-    print("Intended response:")
-    report(output)
+
+    # REPORT SEGMENTATION
+    #print("Intended response:")
+    #report(output)
 
     # Now we'll explore the true maze guided by the output
 
@@ -455,7 +459,7 @@ def node_value_modular(maze_name, nid, kappa=1, bit_threshold = -1):
     if tree[nid]['pos'] in segmentation:
         return steps*kappa - cells*(1-kappa)
     else:
-        return min(
+        return steps + min(
             [node_value_modular(maze_name, chid, kappa, bit_threshold) for chid in tree[nid]['children']]
         )
 
@@ -953,15 +957,17 @@ def visualize_all_best_paths(maze_name, model_name, param):
 # PHASE 3: Extract all optimal plans for each maze
 ##########################################################################################    
 
-algorithm = 'optimal'
+algorithm = 'modular'
 
 best_path_dict = {}
 for maze_name in maze_names:
     maze, exit_pos = read_maze(maze_name, EXPERIMENT) 
-    if algorithm in ['optimal','modular']:
+    if algorithm == 'optimal':
         best_path_list = visualize_all_best_paths(maze_name, 'Expected_Utility', (np.float64(0.2),1,1))
     elif algorithm == 'heuristic':
         best_path_list = visualize_all_best_paths(maze_name, 'Heuristic_Steps', (np.float64(0.2),1))
+    elif algorithm == 'modular':
+        best_path_list = visualize_all_best_paths(maze_name, 'Naive_Modular', (np.float64(0.2),1))
     best_path_dict[maze_name] = best_path_list
 p.pprint(best_path_dict)
 with open(f'__experiment_{EXPERIMENT}/pickled_data/best_path.pickle', 'wb') as handle:
@@ -976,18 +982,21 @@ algorithms = [
     'optimal',
     'modular',
     'heuristic',
+    'discounted',
 ]
 
 algorithm_to_param = {
     'optimal' : (np.float64(0.2), 1, 1),
     'modular' : (np.float64(0.2), 1),
     'heuristic' : (np.float64(0.2), 1), 
+    'discounted' : (np.float64(0.2), 0.7, 1),
 }
 
 algorithm_to_value_path = {
     'optimal' : f'Expected_Utility/node_values_{algorithm_to_param["optimal"]}.pickle',
-    'modular' : f'Naive_Modular/node_values_{algorithm_to_param["heuristic"]}.pickle',
-    'heuristic' : f'Heuristic_Steps/node_values_{algorithm_to_param["heuristic"]}.pickle',  
+    'modular' : f'Naive_Modular/node_values_{algorithm_to_param["modular"]}.pickle',
+    'heuristic' : f'Heuristic_Steps/node_values_{algorithm_to_param["heuristic"]}.pickle',
+    'discounted' : f'Discounted_Utility/node_values_{algorithm_to_param["discounted"]}.pickle',
 }
 # Load the subject decisions
 with open('../compositional_map_synthesis/experiment_Jan_2024/pickled_data/subject_decisions.pickle', 'rb') as handle:
